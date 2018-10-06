@@ -38,6 +38,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character|Gun|Ammo")
 		void SetCurrentAmmo(int NewAmmo) { CurrentAmmo = NewAmmo; }
 
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Camera")
+		float BaseTurnRate;
+
+	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Camera")
+		float BaseLookUpRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Movement")
+		float SprintSpeed;
+
 protected:
 	
 	// We inherit the BeginPlay and OnDeath_Implementation from our Base class
@@ -52,6 +63,18 @@ protected:
 	/** Flag for when the play can shoot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Gun")
 		bool bCanShoot;
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Input|Movement")
+		void MoveForward(float Scalar);
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Input|Movement")
+		void MoveRight(float Scalar);
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Input|Camera")
+		void LookUpRate(float Rate);
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Input|Camera")
+		void TurnAtRate(float Rate);
 	
 	/** Flag for when the play can shoot unlimited amount of bullets */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Gun|Ammo")
@@ -61,5 +84,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character|Gun|Ammo")
 		int MaxAmmo;
+
+	/** Minimum view Pitch, in degree. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Camera")
+		float CameraPitchMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Camera")
+		float CameraPitchMax;
+
+private:
+	
+	float PreviousWalkSpeed;
 	
 };
