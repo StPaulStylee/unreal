@@ -5,6 +5,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 APlayer_Character::APlayer_Character()
 {
@@ -57,6 +60,9 @@ APlayer_Character::APlayer_Character()
 	CameraPitchMax = 80.0f;
 
 	SprintSpeed = 1500.0f;
+
+	TrailEffect = nullptr;
+	HitEffect = nullptr;
 }
 
 void APlayer_Character::BeginPlay()
@@ -66,6 +72,10 @@ void APlayer_Character::BeginPlay()
 	// super on their virtual methods, we can trust that they get called all the way up 
 	// the chain and this is good practice
 	Super::BeginPlay();
+
+	// This will attache the gun to the hand's mesh
+	// The "GripPoint" has already been established on the skeletal mesh and hence we can reference it here
+	GunMesh->AttachToComponent(FP_Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("GripPoint"));
 
 	// For when the max ammo value was changed
 	if (CurrentAmmo != MaxAmmo)
@@ -90,14 +100,34 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	// Here you will notice we are just calling the Blueprint version of these methods... That is fine and is best practice
+	// These will know to include the C++ implementation as well
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &APlayer_Character::OnSprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &APlayer_Character::OnSprintEnd);
+
 	// Camera input
 	PlayerInputComponent->BindAxis("Turn", this, &APlayer_Character::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APlayer_Character::LookUpRate);
-
 }
 
 void APlayer_Character::OnDeath_Implementation()
 {
+}
+
+void APlayer_Character::OnSprintStart_Implementation()
+{
+	bIsSprinting = true;
+	bCanShoot = false;
+	// Save what our walk speed was prior to sprint
+	PreviousWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void APlayer_Character::OnSprintEnd_Implementation()
+{
+	bIsSprinting = false;
+	GetCharacterMovement()->MaxWalkSpeed = PreviousWalkSpeed;
+	bCanShoot = true;
 }
 
 void APlayer_Character::MoveForward(float Scalar)
@@ -137,6 +167,31 @@ void APlayer_Character::TurnAtRate(float Rate)
 {
 	// Adds to the Yaw rotation of the controller at the specified rate(speed)
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->DeltaTimeSeconds);
+}
+
+void APlayer_Character::SpawnShootingParticles(FVector ParticleLocation)
+{
+	if (TrailEffect)
+	{
+		// Spawn the particle
+		UParticleSystemComponent* SpawnedParticle = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TrailEffect, GunMesh->GetSocketLocation(FName("Muzzle")));
+		
+		// Scale the paticle up so its easily visible
+		SpawnedParticle->SetWorldScale3D(FVector(5.0f));
+
+		// Set the end of the particle beam
+		SpawnedParticle->SetVectorParameter(FName("ShockBeamEnd"), ParticleLocation);
+
+		// Check if our hit effect point is valid
+		if (HitEffect)
+		{
+			// Spawn the particle
+			UParticleSystemComponent* SpawnedParticle = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitEffect, ParticleLocation, FRotator::ZeroRotator, true);
+
+			// Scale the particle up so its easily visible
+			SpawnedParticle->SetWorldScale3D(FVector(0.25f));
+		}
+	}
 }
 
 
