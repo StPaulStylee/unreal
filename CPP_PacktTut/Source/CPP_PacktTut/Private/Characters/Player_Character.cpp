@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Animation/AnimInstance.h"
 
 APlayer_Character::APlayer_Character()
 {
@@ -61,6 +62,10 @@ APlayer_Character::APlayer_Character()
 
 	SprintSpeed = 1500.0f;
 
+	DamageAmount = 10.0f;
+
+	FireAnimation = nullptr;
+
 	TrailEffect = nullptr;
 	HitEffect = nullptr;
 }
@@ -112,6 +117,84 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 
 void APlayer_Character::OnDeath_Implementation()
 {
+}
+
+float APlayer_Character::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	// Don't continue if health is already below or at zero
+	if (CurrentHealth <= 0.0f) {
+		return 0.0f;
+	}
+	// Does the math for damaging the player
+	const float SubtractedHealth = CurrentHealth - DamageAmount;
+	//Check if the subtracted health is equal or lower than zero
+	if (FMath::IsNearlyZero(SubtractedHealth) || SubtractedHealth < 0.0f)
+	{
+		// If it is then just lock it to zero and then call our OnDeath function
+		CurrentHealth = 0.0f;
+		OnDeath();
+	}
+	else
+	{
+		// Otherwise set the current health to the subtracted amount
+		CurrentHealth = SubtractedHealth;
+	}
+	return CurrentHealth;
+}
+
+void APlayer_Character::OnFire_Implementation()
+{
+	// First, check if we're allowed to shoot
+	if (bCanShoot)
+	{
+		// Then check if we don't have ammo and we don't ahve unlimed ammo on
+		if (!HasAmmo() && !bUnlimitedAmmo)
+		{
+			return;
+		}
+		// If we're not allowed to shoot then don't continue
+		else 
+		{
+			return;
+		}
+	}
+	// Declare our particle's ending location to be set in the ine trace
+	FVector ParticleLocation = FVector::ZeroVector;
+
+	// Prepare our invisible ray's values
+	FHitResult Hit;
+	const FVector StartTrace = Camera->GetComponentLocation();
+	const FVector EndTrace = StartTrace + (Camera->GetForwardVector() * 10000.0f);
+
+	// Collision objects to ignore
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	QueryParams.AddIgnoredActor(this);
+
+	// Fire an invisible ray
+	GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECollisionChannel::ECC_Visibility, QueryParams);
+
+	// If we hit something then damage it and set our particle location
+	if (Hit.bBlockingHit && Hit.GetActor())
+	{
+		// Set the location for the particles to end at
+		ParticleLocation = Hit.ImpactPoint;
+
+		// Create the object for a general object type
+		TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
+
+		// Set out general damage type to a specific type: Point Damage
+		FPointDamageEvent PointDamageEvent(DamageAmount, Hit, Hit.ImpactNormal, ValidDamageTypeClass);
+
+		// Damage Actor
+		Hit.GetActor()->TakeDamage(DamageAmount, PointDamageEvent, GetController(), GetOwner());
+	}
+	else
+	{
+		// Set the location for the particles to end at
+		ParticleLocation = EndTrace;
+	}
 }
 
 void APlayer_Character::OnSprintStart_Implementation()

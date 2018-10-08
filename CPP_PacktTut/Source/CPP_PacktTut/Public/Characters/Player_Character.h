@@ -57,6 +57,13 @@ protected:
 
 	virtual void OnDeath_Implementation() override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character|Input|Gun")
+		void OnFire();
+	virtual void OnFire_Implementation();
+
 	/** Check and see if we have any remaining ammo */
 	bool HasAmmo() const { return (CurrentAmmo > 0); }
 
@@ -73,6 +80,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character|Gun")
 		class UParticleSystem* HitEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character|Gun")
+		class UAnimMontage* FireAnimation;
+
+	/** The amount of damage that the gun shoots and applies on an actor */
+	UPROPERTY(EdityAnywhere, BlueprintReadWrite, Category = "Character|Gun")
+		float DamageAmount;
 
 	/** Flag for when the play can shoot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Gun")
