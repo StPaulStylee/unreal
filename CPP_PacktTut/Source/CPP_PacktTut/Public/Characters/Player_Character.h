@@ -85,7 +85,7 @@ protected:
 		class UAnimMontage* FireAnimation;
 
 	/** The amount of damage that the gun shoots and applies on an actor */
-	UPROPERTY(EdityAnywhere, BlueprintReadWrite, Category = "Character|Gun")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Gun")
 		float DamageAmount;
 
 	/** Flag for when the play can shoot */

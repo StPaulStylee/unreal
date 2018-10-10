@@ -97,6 +97,9 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 	// if it is false. Think of it has a super aggressive if statment
 	check(PlayerInputComponent);
 
+	// Shoot input
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayer_Character::OnFire);
+
 	// Movment input 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayer_Character::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayer_Character::MoveRight);
@@ -194,6 +197,14 @@ void APlayer_Character::OnFire_Implementation()
 	{
 		// Set the location for the particles to end at
 		ParticleLocation = EndTrace;
+	}
+	SpawnShootingParticles(ParticleLocation);
+
+	// If we don't have unlimited ammo on, then use up on bullet
+	if (!bUnlimitedAmmo)
+	{
+		// Subtract current ammo by one and then set it to that value
+		CurrentAmmo--;
 	}
 }
 
