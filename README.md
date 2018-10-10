@@ -9,3 +9,6 @@ Today was a little better, but I am feeling a bit overwhelmed. The tut moves hel
 
 ### Day 8
 I haven't updated this file in the last 6 days but I've made a lot of progress so far. I am learning the syntax and architecture of C++ classes and am getting more comforatable with them by the day. Further, the game play of the game is coming along. I have created the playable character that can now move about the map, shoot their weapon, and has the beginings of a HUD. I am really digging this shit so far.
+
+### Day 9
+Tonight I finished implementing the code that allows the player to shoot their weapon. Along with that, I implemented an animation for when the weapon is fired. 
