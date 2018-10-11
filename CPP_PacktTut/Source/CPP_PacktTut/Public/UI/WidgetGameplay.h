@@ -14,7 +14,11 @@ class CPP_PACKTTUT_API UWidgetGameplay : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+protected:
+
+	UFUNCTION(BlueprintPure, Category = "Widget|Gameplay")
+		float GetCurrentHealth();
+
+	UFUNCTION(BlueprintPure, Category = "WidgetGameplay")
+		FText GetCurrentAmmo();
 };
