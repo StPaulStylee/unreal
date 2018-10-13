@@ -12,3 +12,7 @@ I haven't updated this file in the last 6 days but I've made a lot of progress s
 
 ### Day 9
 Tonight I finished implementing the code that allows the player to shoot their weapon. Along with that, I implemented an animation for when the weapon is fired. 
+
+
+### Day 11
+Over the last few days I created classes for the Generic HUD and gameplay HUD - Pause menu, death menu cross hairs and status bar. My understanding of C++ is improving s well. I still have  a long way to go on that regard but my ability obtread the code and understand t hais vastoy improved.
