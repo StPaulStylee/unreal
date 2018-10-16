@@ -29,6 +29,12 @@ public:
 	// Constructor
 	APlayer_Character();
 
+	UFUNCTION(BlueprintCallable, Category = "Character|Input")
+		void PauseGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Character|Input")
+		void UnPauseGame();
+
 	UFUNCTION(BlueprintPure, Category = "Character|Gun|Ammo")
 		int32 GetCurrentAmmo() const { return CurrentAmmo; }
 
@@ -54,7 +60,7 @@ protected:
 	// We inherit the BeginPlay and OnDeath_Implementation from our Base class
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
+	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnDeath_Implementation() override;
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent,
@@ -125,5 +131,9 @@ private:
 	float PreviousWalkSpeed;
 
 	void SpawnShootingParticles(FVector ParticleLocation);
+
+	// We use UPROPERTY here because we want it to be able to be garbage collected
+	UPROPERTY()
+		class AGenericHud* HudReference;
 	
 };

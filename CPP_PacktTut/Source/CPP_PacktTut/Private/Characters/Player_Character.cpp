@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Animation/AnimInstance.h"
+#include "UI/GenericHud.h"
 
 APlayer_Character::APlayer_Character()
 {
@@ -68,6 +69,50 @@ APlayer_Character::APlayer_Character()
 
 	TrailEffect = nullptr;
 	HitEffect = nullptr;
+
+	HudReference = nullptr;
+}
+
+void APlayer_Character::PauseGame()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		// Check if we dont have a valid huh, edgecase
+		if (!HudReference)
+		{
+			HudReference = Cast<AGenericHud>(PC->GetHUD());
+		}
+
+		// Checks if we now have a valid hud ref
+		if (HudReference)
+		{
+			HudReference->ShowSpecificMenu(HudReference->GetPauseMenuClass(), false, true);
+		}
+
+		// Pause the Game
+		PC->SetPause(true);
+	}
+}
+
+void APlayer_Character::UnPauseGame()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		// UnPause the Game
+		PC->SetPause(false);
+
+		// Check if we dont have a valid huh, edgecase
+		if (!HudReference)
+		{
+			HudReference = Cast<AGenericHud>(PC->GetHUD());
+		}
+
+		// Checks if we now have a valid hud ref
+		if (HudReference)
+		{
+			HudReference->ShowSpecificMenu(HudReference->GetGameplayHUDClass(), true, false);
+		}
+	}
 }
 
 void APlayer_Character::BeginPlay()
@@ -118,8 +163,36 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 	PlayerInputComponent->BindAxis("LookUp", this, &APlayer_Character::LookUpRate);
 }
 
+void APlayer_Character::PossessedBy(AController * NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Get and set our HUD reference
+	if (APlayerController* PC = Cast<APlayerController>(NewController))
+	{
+		// Try and get a reference to the generic HUD
+		HudReference = Cast<AGenericHud>(PC->GetHUD());
+		if (HudReference)
+			// If we successfully got the generic hud then show the gamplay hud
+			HudReference->ShowSpecificMenu(HudReference->GetGameplayHUDClass(), true, false);
+	}
+}
+
 void APlayer_Character::OnDeath_Implementation()
 {
+	if (!HudReference)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			HudReference = Cast<AGenericHud>(PC->GetHUD());
+		}
+	}
+	// Checks if we now have a valid hud ref
+	if (HudReference)
+	{
+		// Show the dead menu
+		HudReference->ShowSpecificMenu(HudReference->GetDeadMenuClass(), false, true);
+	}
 }
 
 float APlayer_Character::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
