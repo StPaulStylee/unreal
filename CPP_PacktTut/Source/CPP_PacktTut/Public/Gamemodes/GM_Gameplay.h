@@ -14,6 +14,9 @@ class CPP_PACKTTUT_API AGM_Gameplay : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION(BlueprintCallable, Category = "Game")
+		void RespawnPlayer(AController* NewPlayer);
 	
 	
 	
