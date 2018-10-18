@@ -180,6 +180,21 @@ void APlayer_Character::PossessedBy(AController * NewController)
 
 void APlayer_Character::OnDeath_Implementation()
 {
+	bCanShoot = false;
+
+	// Stop all movement so the player cannot move at all
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetJumpAllowed(false);
+
+	// Detach the gun mesh becasue it will be trying to attach to a socket
+	// that doesn't exit when we set the mesh to null
+	GunMesh->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+
+	// Hide players hands and gun
+	GunMesh->SetHiddenInGame(true);
+	FP_Mesh->SetHiddenInGame(true);
+
 	if (!HudReference)
 	{
 		if (APlayerController* PC = Cast<APlayerController>(GetController()))
