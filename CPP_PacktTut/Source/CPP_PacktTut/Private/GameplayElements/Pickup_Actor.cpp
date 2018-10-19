@@ -1,27 +1,42 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GameplayElements/Pickup_Actor.h"
-
+#include "Components/SphereComponent.h"
+#include "Player_Character.h"
 
 // Sets default values
 APickup_Actor::APickup_Actor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	// Create the collection box component and set it as the root component
+	RootComponent = CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
+	if (CollectionSphere)
+	{
+		// Ignore every other channel
+		CollectionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+		// Only register pawns that overlap this actor and nothing else
+		CollectionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+		// Bind the OnComonentBeginOverlap delage to our function
+		CollectionSphere->OnComponentBeginOverlap.AddDynamic(this, &APickup_Actor::OnSphereOverlap);
+	}
 
 }
 
-// Called when the game starts or when spawned
-void APickup_Actor::BeginPlay()
+void APickup_Actor::OnCollection_Implementation(APlayer_Character * Collector)
 {
-	Super::BeginPlay();
-	
+	// Destory this actor
+	Destroy();
 }
 
-// Called every frame
-void APickup_Actor::Tick(float DeltaTime)
+void APickup_Actor::OnSphereOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * CtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	Super::Tick(DeltaTime);
-
+	// Check if the pawn that enter is our player pawn
+	APlayer_Character* Player = Cast<APlayer_Character>(OtherActor);
+	if (Player)
+	{
+		// Pass in the player refernce to OnCollected
+		OnCollection(Player);
+	}
 }
+
+
 
