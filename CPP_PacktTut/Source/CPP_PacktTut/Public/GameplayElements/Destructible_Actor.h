@@ -27,5 +27,19 @@ protected:
 		void OnDeath();
 	void OnDeath_Implementation();
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Destructible|Death")
+		float DestructionRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Destructible|Death")
+		float DestructionDamage;
+	
+	float CurrentHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Destructible|Health")
+		float MaxHealth;
+
 
 };
