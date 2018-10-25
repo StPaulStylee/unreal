@@ -145,6 +145,8 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 	// Shoot input
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayer_Character::OnFire);
 
+	PlayerInputComponent->BindAction("PauseGame", IE_Pressed, this, &APlayer_Character::PauseGame);
+
 	// Movment input 
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayer_Character::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayer_Character::MoveRight);
