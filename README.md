@@ -19,3 +19,7 @@ Over the last few days I created classes for the Generic HUD and gameplay HUD - 
 
 ### Day 20
 I haven't been keeping up with the README.md but that is ok. I'll give a quick update. So, I have a fully functioning character - they shoot, sprint, run out of ammo, die, etc. I have also implemented destructible items in my game - THEY EXPLODE! Today, I didn't write any code that I can commit to the Github, but I implemented the start game menu all with Blueprint Scripting. It was really quite simple... I am excited to play around with all of the options Unreal provides. I am curious has to house you could possibly use code to make a really unique and baller Menu - These are things I will study in between challenges... BTW, taht is my plan once this challenge is over... I am going to read over all of the code I have implemented in the 30 days and read over everything I did along with Unreals docs. I hope to really add valuable context to what I am been developing here in this tutorial.
+
+### Day 27
+Aa the challenge closes in on it's final day, I am all the more excited to keep using and growing my skills in I real and C++. I will go through the code line by line and read the documentation rofm Unreal ont really get a feel for everything nhiave done tonight nda prior. Further, I need to dedicate more time to C++ as there are still practices I. Not confident with... Like pointers.
+
