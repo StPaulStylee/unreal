@@ -20,27 +20,28 @@ bool UPauseMenu::Initialize()
 		ResumeButton->OnClicked.AddDynamic(this, &UPauseMenu::OnResumeClicked);
 	}
 
-	// Same as above
+	// Bind the OnDesktopClicked function to the DesktopButton delegate for OnClicked
 	if (DesktopButton)
 	{
 		DesktopButton->OnClicked.AddDynamic(this, &UPauseMenu::OnDesktopClicked);
 	}
 
-	// And again for main menu
+	// Bind the OnMainMenuClicked function to the MainMenuButton delegate for OnClicked
 	if (MainMenuButton)
 	{
 		MainMenuButton->OnClicked.AddDynamic(this, &UPauseMenu::OnMainMenuClicked);
 	}
-	// CONTINUE AT ~5 min mark. You are getting compile errors.
+
+	// Finish the function
 	return true;
 }
 
 void UPauseMenu::OnResumeClicked()
 {
-	// Check for valid player reference
+	// Check for a valid player reference
 	if (APlayer_Character* Player = Cast<APlayer_Character>(GetOwningPlayerPawn()))
 	{
-		// Unpause the game, which hanles removing the menu
+		// If its valid then unpause the game, which handles removing the menu
 		Player->UnPauseGame();
 	}
 }
