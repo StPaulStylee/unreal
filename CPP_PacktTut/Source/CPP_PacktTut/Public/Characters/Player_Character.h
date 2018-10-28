@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Base_Character.h"
+#include "GameplayElements/Interaction_Interface.h"
 #include "Player_Character.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CPP_PACKTTUT_API APlayer_Character : public ABase_Character
+class CPP_PACKTTUT_API APlayer_Character : public ABase_Character, public IInteraction_Interface
 {
 	GENERATED_BODY()
 
@@ -65,6 +66,9 @@ protected:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const &DamageEvent,
 		class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void OnInteract_Implementation(AActor* Interactor)
+		PURE_VIRTUAL(IInteraction_Interface::OnInteract_Implementation, );
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Character|Input|Gun")
 		void OnFire();
