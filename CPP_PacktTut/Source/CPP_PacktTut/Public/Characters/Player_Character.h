@@ -130,11 +130,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|Camera")
 		float CameraPitchMax;
 
+	/** The range or distance needed for our interaction to actually register */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+		float InteractionDistance;
+
 private:
 	
 	float PreviousWalkSpeed;
 
 	void SpawnShootingParticles(FVector ParticleLocation);
+
+	UFUNCTION()
+		void Interact();
 
 	// We use UPROPERTY here because we want it to be able to be garbage collected
 	UPROPERTY()

@@ -65,6 +65,8 @@ APlayer_Character::APlayer_Character()
 
 	DamageAmount = 10.0f;
 
+	InteractionDistance = 10.0f;
+
 	FireAnimation = nullptr;
 
 	TrailEffect = nullptr;
@@ -141,6 +143,8 @@ void APlayer_Character::SetupPlayerInputComponent(UInputComponent * PlayerInputC
 	// Assertion check - This is a macro that will cause the program to crash
 	// if it is false. Think of it has a super aggressive if statment
 	check(PlayerInputComponent);
+
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayer_Character::Interact);
 
 	// Shoot input
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayer_Character::OnFire);
@@ -374,6 +378,43 @@ void APlayer_Character::SpawnShootingParticles(FVector ParticleLocation)
 
 			// Scale the particle up so its easily visible
 			SpawnedParticle->SetWorldScale3D(FVector(0.25f));
+		}
+	}
+}
+
+void APlayer_Character::Interact()
+{
+	// Prepare our invisible ray's values
+	FHitResult Hit;
+	const FVector StartTrace = Camera->GetComponentLocation();
+	const FVector EndTrace = StartTrace + (Camera->GetForwardVector() * InteractionDistance);
+
+	// Collision to ignore
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	QueryParams.AddIgnoredActor(this);
+
+	// Fire Invisible Ray
+	GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECollisionChannel::ECC_Visibility, QueryParams);
+
+	// Check if we hit anything
+	if (Hit.bBlockingHit)
+	{
+		AActor* HitActor = Hit.GetActor();
+		// Check if it has the interface implemented, wors on C++ and BP level
+		if (HitActor->GetClass()->ImplementsInterface(UInteraction_Interface::StaticClass()))
+		{
+			// Cast for a C++ Interface
+			if (IInteraction_Interface* Interface = Cast<IInteraction_Interface>(HitActor))
+			{
+				// Call C++ Layer
+				Interface->Execute_OnInteract(HitActor, this);
+			}
+			else
+			{
+				// Call BP Layer
+				IInteraction_Interface::Execute_OnInteract(HitActor, this);
+			}
 		}
 	}
 }
